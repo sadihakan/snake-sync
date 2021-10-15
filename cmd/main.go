@@ -5,18 +5,27 @@ import (
 	"flag"
 	"fmt"
 	snakesync "github.com/sadihakan/snake-sync"
+	"github.com/sadihakan/snake-sync/notify"
 )
 
 var (
 	scanStyle bool
-	path string
+	path      string
 )
 
+type NotifyCallback struct {
+	notify.Callback
+}
+
+func (NotifyCallback) Notify(notify notify.Notify) {
+	fmt.Println("Something happened: ", notify)
+}
 
 func main() {
 
 	flag.BoolVar(&scanStyle, "scan", false, "")
 	flag.StringVar(&path, "path", "", "File path")
+	flag.Parse()
 
 	if scanStyle {
 		fmt.Println("Add file path: ")
@@ -25,21 +34,26 @@ func main() {
 		}
 	}
 
+	// Make callback
+	cb := new(NotifyCallback)
+
+	// Inıtılıze snake sync
 	ss := snakesync.New()
 
 	//Create Watcher
 	ss.NewWatcher()
 
+	//Set Callback
+	ss.SetNotifyCallback(cb)
+
 	//Add file path
 	ss.AddFilePath(path)
-
-	done := make(chan bool)
 
 	if ss.Error != nil {
 		panic(ss.Error)
 	}
 
-	ss.Chase(done)
+	go ss.Chase()
 
-	<-done
+	<-ss.Chan()
 }

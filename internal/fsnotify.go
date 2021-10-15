@@ -2,12 +2,15 @@ package internal
 
 import (
 	fsnotify "github.com/fsnotify/fsnotify"
+	"github.com/sadihakan/snake-sync/notify"
 	"log"
 )
 
 type FSNotify struct {
 	Sync
-	Watcher *fsnotify.Watcher
+	Watcher  *fsnotify.Watcher
+	callback notify.Callback
+	ch       chan struct{}
 }
 
 func (f *FSNotify) NewWatcher() error {
@@ -19,11 +22,19 @@ func (f *FSNotify) NewWatcher() error {
 	return nil
 }
 
+func (f *FSNotify) SetChan(ch chan struct{}) {
+	f.ch = ch
+}
+
 func (f *FSNotify) AddFilePath(file string) error {
 	return f.Watcher.Add(file)
 }
 
-func (f *FSNotify) Chase(done chan bool) {
+func (f *FSNotify) SetNotifyCallback(callback notify.Callback) {
+	f.callback = callback
+}
+
+func (f *FSNotify) Chase() {
 	defer f.Watcher.Close()
 
 	go func() {
@@ -33,9 +44,11 @@ func (f *FSNotify) Chase(done chan bool) {
 				if !ok {
 					return
 				}
-				log.Println("modified file:", event.Name, "modified type:", event.Op)
-				if event.Op&fsnotify.Write == fsnotify.Write {
-					log.Println("modified file:", event.Name)
+				if f.callback != nil {
+					f.callback.Notify(notify.Notify{
+						EventType: event.Name,
+						Path:      event.Op.String(),
+					})
 				}
 			case err, ok := <-f.Watcher.Errors:
 				if !ok {
@@ -46,5 +59,5 @@ func (f *FSNotify) Chase(done chan bool) {
 		}
 	}()
 
-	<-done
+	<-f.ch
 }
