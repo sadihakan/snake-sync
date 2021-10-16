@@ -70,7 +70,7 @@ func main() {
 
 Contributors names and contact info
 
-ex. [@sadihakan](https://github.com/sadihakan/)
+ex. [@sadihakan](https://github.com/sadihakan/)  
 ex. [@akdilsiz](https://github.com/akdilsiz/)
 
 ## License
