@@ -43,18 +43,6 @@ import (
 )
 
 func main() {
-
-	flag.BoolVar(&scanStyle, "scan", false, "")
-	flag.StringVar(&path, "path", "", "File path")
-	flag.Parse()
-
-	if scanStyle {
-		fmt.Println("Add file path: ")
-		if _, err := fmt.Scanln(&path); err != nil {
-			panic(errors.New("Path cannot be nil"))
-		}
-	}
-
 	// Make callback
 	cb := new(NotifyCallback)
 
