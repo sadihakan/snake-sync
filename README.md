@@ -44,23 +44,39 @@ import (
 
 func main() {
 
-  ss := snakesync.New()
+	flag.BoolVar(&scanStyle, "scan", false, "")
+	flag.StringVar(&path, "path", "", "File path")
+	flag.Parse()
 
-  //Create Watcher
-  ss.NewWatcher()
+	if scanStyle {
+		fmt.Println("Add file path: ")
+		if _, err := fmt.Scanln(&path); err != nil {
+			panic(errors.New("Path cannot be nil"))
+		}
+	}
 
-  //Add file path
-  ss.AddFilePath(path)
+	// Make callback
+	cb := new(NotifyCallback)
 
-  done := make(chan bool)
+	// Inıtılıze snake sync
+	ss := snakesync.New()
 
-  if ss.Error != nil {
-    panic(ss.Error)
-  }
+	//Create Watcher
+	ss.NewWatcher()
 
-  ss.Chase(done)
+	//Set Callback
+	ss.SetNotifyCallback(cb)
 
-  <-done
+	//Add file path
+	ss.AddFilePath(path)
+
+	if ss.Error != nil {
+		panic(ss.Error)
+	}
+
+	go ss.Chase()
+
+	<-ss.Chan()
 }
 ```
 
