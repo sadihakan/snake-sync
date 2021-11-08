@@ -30,24 +30,30 @@ func main() {
 	if scanStyle {
 		fmt.Println("Add file path: ")
 		if _, err := fmt.Scanln(&path); err != nil {
-			panic(errors.New("Path cannot be nil"))
+			panic(errors.New("path cannot be nil"))
 		}
 	}
 
 	// Make callback
 	cb := new(NotifyCallback)
 
-	// Inıtılıze snake sync
+	// Install snake sync
 	ss := snakesync.New()
 
 	//Create Watcher
-	ss.NewWatcher()
+	err := ss.NewWatcher()
+	if err != nil {
+		return
+	}
 
 	//Set Callback
 	ss.SetNotifyCallback(cb)
 
 	//Add file path
-	ss.AddFilePath(path)
+	err = ss.AddFilePath(path)
+	if err != nil {
+		return
+	}
 
 	if ss.Error != nil {
 		panic(ss.Error)
