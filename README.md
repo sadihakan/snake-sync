@@ -6,7 +6,7 @@ Simple File Backup Tool
 
 ### Requirements
 
-* Go >= 1.15
+* Go >= 1.17
 
 ## CLI Usage
 
