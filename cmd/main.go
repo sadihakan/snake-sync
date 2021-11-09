@@ -6,6 +6,8 @@ import (
 	"fmt"
 	snakesync "github.com/sadihakan/snake-sync"
 	"github.com/sadihakan/snake-sync/notify"
+	"io/ioutil"
+	"log"
 )
 
 var (
@@ -18,7 +20,7 @@ type NotifyCallback struct {
 }
 
 func (NotifyCallback) Notify(notify notify.Notify) {
-	fmt.Println("Something happened: ", notify)
+	fmt.Println("Something happened: ", notify.EventType)
 }
 
 func main() {
@@ -57,6 +59,15 @@ func main() {
 
 	if ss.Error != nil {
 		panic(ss.Error)
+	}
+
+	files, err := ioutil.ReadDir(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, file := range files {
+		fmt.Println(file.Name(), file.Size(), file.IsDir())
 	}
 
 	go ss.Chase()

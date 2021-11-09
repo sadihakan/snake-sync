@@ -44,10 +44,12 @@ func (f *FSNotify) Chase() {
 				if !ok {
 					return
 				}
+				//bb, _ := json.Marshal(event)
+				//fmt.Println(string(bb))
 				if f.callback != nil {
 					f.callback.Notify(notify.Notify{
-						EventType: event.Name,
-						Path:      event.Op.String(),
+						EventType: event.Op.String(),
+						Path:      event.Name,
 					})
 				}
 			case err, ok := <-f.Watcher.Errors:
